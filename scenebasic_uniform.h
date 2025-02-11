@@ -6,7 +6,10 @@
 #include <glad/glad.h>
 #include "helper/glslprogram.h"
 #include "helper/torus.h"
+#include "helper/teapot.h"
 #include <glm/glm.hpp>
+#include "helper/plane.h"
+#include "helper/objmesh.h"
 
 #include <glm/ext/matrix_transform.hpp>
 
@@ -14,6 +17,12 @@ class SceneBasic_Uniform : public Scene
 {
 private:
     Torus torus;
+    Plane plane;
+    Teapot teapot;
+    //std::unique_ptr<ObjMesh> mesh;
+	float tPrev;
+    float angle;
+
     GLSLProgram prog;
     void setMatrices();
 
