@@ -16,7 +16,6 @@
 class SceneBasic_Uniform : public Scene
 {
 private:
-    Torus torus;
     Plane plane;
     Teapot teapot;
     //std::unique_ptr<ObjMesh> mesh;
