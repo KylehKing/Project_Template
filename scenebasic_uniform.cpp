@@ -20,7 +20,7 @@ using glm::vec4;
 using glm::mat4;
 using glm::mat3;
 SceneBasic_Uniform::SceneBasic_Uniform() :
-	tPrev(0){
+	tPrev(0), angle(0.0f), rotSpeed(glm::pi<float>()/2.0f), teapot(14, glm::mat4(1.0f)){
 	//mesh = ObjMesh::load("media/pig_triangulated.obj", true);
 }
 
@@ -29,7 +29,6 @@ void SceneBasic_Uniform::initScene()
     compile();
 	glEnable(GL_DEPTH_TEST);
 	model = mat4(1.0f);
-	view = glm::lookAt(vec3(1.0f, 1.25f, 1.25f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	//model = glm::rotate(model, glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
 	//model = glm::rotate(model, glm::radians(15.0f), vec3(0.0f, 1.0f, 0.0f));
 	projection = mat4(1.0f);
@@ -63,18 +62,24 @@ void SceneBasic_Uniform::compile()
 void SceneBasic_Uniform::update( float t )
 {
 	float deltaT = t - tPrev;
+
 	if (tPrev == 0.0f) deltaT = 0.0f;
 	tPrev = t;
 	angle += 0.1f * deltaT;
-	if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
+
+	if (this->m_animate){
+		angle += rotSpeed * deltaT;
+		if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
+	}
 }
 
 void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	vec4 lightPos = vec4(10.0f*cos(angle), 10.0f, 10.0f*sin(angle), 1.0f);
-	prog.setUniform("Light.Position", vec4(view*lightPos));
+	vec3 cameraPos = vec3(6.0f*cos(angle), 1.0f, 6.0f*sin(angle));
+	view = glm::lookAt(cameraPos, vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	prog.setUniform("Light.Position", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		
 	prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));
 	prog.setUniform("Material.Ka", vec3(0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f));
@@ -85,7 +90,7 @@ void SceneBasic_Uniform::render()
 	model = mat4(1.0f);
 	model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
 	setMatrices();
-	cube.render();
+	teapot.render();
 }
 
 void SceneBasic_Uniform::resize(int w, int h)
