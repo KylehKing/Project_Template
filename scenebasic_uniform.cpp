@@ -13,6 +13,7 @@ using std::endl;
 
 #include "helper/glutils.h"
 #include <glm/ext/matrix_clip_space.hpp>
+#include "helper/texture.h"
 
 using glm::vec3;
 using glm::vec4;
@@ -36,6 +37,10 @@ void SceneBasic_Uniform::initScene()
 
 	prog.setUniform("Light.L", vec3(1.0f));
 	prog.setUniform("Light.La", vec3(0.05f));
+
+	GLuint texID = Texture::loadTexture("media/texture/brick1.jpg");
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texID);
 }
 
 void SceneBasic_Uniform::compile()
