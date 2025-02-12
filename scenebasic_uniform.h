@@ -10,14 +10,14 @@
 #include <glm/glm.hpp>
 #include "helper/plane.h"
 #include "helper/objmesh.h"
+#include "helper/cube.h"
 
 #include <glm/ext/matrix_transform.hpp>
 
 class SceneBasic_Uniform : public Scene
 {
 private:
-    Plane plane;
-    Teapot teapot;
+    Cube cube;
     //std::unique_ptr<ObjMesh> mesh;
 	float tPrev;
     float angle;

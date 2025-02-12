@@ -19,9 +19,7 @@ using glm::vec4;
 using glm::mat4;
 using glm::mat3;
 SceneBasic_Uniform::SceneBasic_Uniform() :
-	tPrev(0),
-	plane(50.0f, 50.0f, 1, 1), 
-	teapot(14, glm::mat4(1.0f)){
+	tPrev(0){
 	//mesh = ObjMesh::load("media/pig_triangulated.obj", true);
 }
 
@@ -30,17 +28,14 @@ void SceneBasic_Uniform::initScene()
     compile();
 	glEnable(GL_DEPTH_TEST);
 	model = mat4(1.0f);
-	view = glm::lookAt(vec3(0.0f, 4.0f, 6.0f), vec3(0.0f, 0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	view = glm::lookAt(vec3(1.0f, 1.25f, 1.25f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	//model = glm::rotate(model, glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
 	//model = glm::rotate(model, glm::radians(15.0f), vec3(0.0f, 1.0f, 0.0f));
 	projection = mat4(1.0f);
 	angle = 0.0f;
 
-	prog.setUniform("Light.L", vec3(0.9f));
-	prog.setUniform("Light.La", vec3(0.5f));
-	prog.setUniform("Fog.MaxDist", 20.0f);
-	prog.setUniform("Fog.MinDist", 10.0f);
-	prog.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+	prog.setUniform("Light.L", vec3(1.0f));
+	prog.setUniform("Light.La", vec3(0.05f));
 }
 
 void SceneBasic_Uniform::compile()
@@ -77,24 +72,11 @@ void SceneBasic_Uniform::render()
 	prog.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
 	prog.setUniform("Material.Shininess", 100.0f);
 	
-	float dist = 0.0f;
-	for (int i = 0; i < 5; i++) {
-		model = mat4(1.0f);
-		model = glm::translate(model, vec3(dist*0.6f-1.0f, 0.0f, -dist));
-		model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
-		setMatrices();
-		teapot.render();
-		dist += 7.0f;
-	}
-
-	prog.setUniform("Material.Kd", vec3(0.7f, 0.7f, 0.7f));
-	prog.setUniform("Material.Ks", vec3(0.0f, 0.0f, 0.0f));
-	prog.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
-	prog.setUniform("Material.Shininess", 180.0f);
 
 	model = mat4(1.0f);
+	model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
 	setMatrices();
-	plane.render();
+	cube.render();
 }
 
 void SceneBasic_Uniform::resize(int w, int h)

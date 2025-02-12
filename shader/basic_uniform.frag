@@ -19,11 +19,6 @@ uniform struct MaterialInfo{
     float Shininess;
 }Material;
 
-uniform struct FogInfo{
-    float MaxDist;
-    float MinDist;
-    vec3 Color;
-}Fog;
 
 vec3 blinnPhong (vec3 position, vec3 n){
     vec3 diffuse=vec3(0.0), spec=vec3(0.0);
@@ -40,12 +35,5 @@ vec3 blinnPhong (vec3 position, vec3 n){
 }
 
 void main() {
-    float dist = abs(Position.z);
-    float fogFactor = (Fog.MaxDist - dist) / (Fog.MaxDist - Fog.MinDist);
-    fogFactor = clamp(fogFactor, 0.0, 1.0);
-    vec3 shadeColor = blinnPhong(Position, normalize(Normal));
-    vec3 color = mix(Fog.Color, shadeColor, fogFactor);
-
-
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(blinnPhong(Position, normalize(Normal)), 1.0);
 }
