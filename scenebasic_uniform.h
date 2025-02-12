@@ -18,9 +18,9 @@ class SceneBasic_Uniform : public Scene
 {
 private:
     //Cube cube;
-    Teapot teapot;
-    //std::unique_ptr<ObjMesh> mesh;
-    GLuint brick, moss;
+    //Teapot teapot;
+    std::unique_ptr<ObjMesh> ogre;
+   
     float rotSpeed;
 	float tPrev;
     float angle;

@@ -20,8 +20,8 @@ using glm::vec4;
 using glm::mat4;
 using glm::mat3;
 SceneBasic_Uniform::SceneBasic_Uniform() :
-	tPrev(0), angle(0.0f), rotSpeed(glm::pi<float>()/2.0f), teapot(14, glm::mat4(1.0f)){
-	//mesh = ObjMesh::load("media/pig_triangulated.obj", true);
+	tPrev(0), angle(0.0f), rotSpeed(glm::pi<float>()/8.0f){
+	ogre = ObjMesh::load("media/bs_ears.obj", false, true);
 }
 
 void SceneBasic_Uniform::initScene()
@@ -37,13 +37,13 @@ void SceneBasic_Uniform::initScene()
 	prog.setUniform("Light.L", vec3(1.0f));
 	prog.setUniform("Light.La", vec3(0.05f));
 
-	GLuint brick = Texture::loadTexture("media/texture/brick1.jpg");
-	GLuint moss = Texture::loadTexture("media/texture/moss.png");
+	GLuint diffTex = Texture::loadTexture("media/texture/ogre_diffuse.png");
+	GLuint normalTex = Texture::loadTexture("media/texture/ogre_normalmap.png");
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, brick);
+	glBindTexture(GL_TEXTURE_2D, diffTex);
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, moss);
+	glBindTexture(GL_TEXTURE_2D, normalTex);
 }
 
 void SceneBasic_Uniform::compile()
@@ -77,9 +77,9 @@ void SceneBasic_Uniform::render()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-	vec3 cameraPos = vec3(6.0f*cos(angle), 1.0f, 6.0f*sin(angle));
-	view = glm::lookAt(cameraPos, vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	prog.setUniform("Light.Position", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	vec3 cameraPos = vec3(-1.0f, 0.25f, 2.0f);
+	view = glm::lookAt(cameraPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	prog.setUniform("Light.Position", view*glm::vec4(10.0f*cos(angle), 1.0f, 10.0f*sin(angle), 1.0f));
 		
 	prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));
 	prog.setUniform("Material.Ka", vec3(0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f));
@@ -88,9 +88,8 @@ void SceneBasic_Uniform::render()
 	
 
 	model = mat4(1.0f);
-	model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
 	setMatrices();
-	teapot.render();
+	ogre->render();
 }
 
 void SceneBasic_Uniform::resize(int w, int h)
