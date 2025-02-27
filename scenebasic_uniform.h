@@ -44,6 +44,11 @@ private:
     
     // Keyboard state
     bool keys[256];
+    
+    // Fog variables
+    float fogMinDist;
+    float fogMaxDist;
+    glm::vec3 fogColor;
 
     GLSLProgram prog;
     void setMatrices();

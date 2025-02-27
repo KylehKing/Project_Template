@@ -20,6 +20,12 @@ uniform struct MaterialInfo {
     float Shininess;
 } Material;
 
+uniform struct FogInfo {
+    float MaxDist;
+    float MinDist;
+    vec3 Color;
+} Fog;
+
 uniform sampler2D DiffTex;
 uniform sampler2D NormalTex;
 
@@ -59,12 +65,19 @@ vec3 blinnPhong(vec3 position, vec3 normal) {
 
 void main() {
     vec3 normalMap = texture(NormalTex, TexCoord).rgb * 2.0 - 1.0;
-
     mat3 TBN = calculateTBN(normalize(Normal));
     
     vec3 normal = normalize(TBN * normalMap);
     
     vec4 texColor = texture(DiffTex, TexCoord);
     vec3 lightColor = blinnPhong(Position, normal);
-    FragColor = vec4(lightColor, 1.0) * texColor;
+    vec3 finalColor = lightColor * texColor.rgb;
+    
+    float dist = abs(Position.z);
+    float fogFactor = (Fog.MaxDist - dist) / (Fog.MaxDist - Fog.MinDist);
+    fogFactor = clamp(fogFactor, 0.0, 1.0);
+    
+    finalColor = mix(Fog.Color, finalColor, fogFactor);
+    
+    FragColor = vec4(finalColor, 1.0);
 }

@@ -24,14 +24,17 @@ using glm::mat4;
 using glm::mat3;
 SceneBasic_Uniform::SceneBasic_Uniform() :
 	tPrev(0), angle(0.0f), rotSpeed(glm::pi<float>()/8.0f),
-	cameraPos(vec3(-1.0f, 0.25f, 2.0f)),
-	cameraFront(vec3(0.0f, 0.0f, -1.0f)),
+	cameraPos(vec3(-1.0f, 1.5f, 0.5f)),
+	cameraFront(vec3(1.0f, 0.0f, 0.0f)),
 	cameraUp(vec3(0.0f, 1.0f, 0.0f)),
 	cameraSpeed(5.0f),
-	yaw(-90.0f), pitch(0.0f),
+	yaw(0.0f), pitch(0.0f),
 	lastX(400.0f), lastY(300.0f),
 	firstMouse(true),
-	mouseSensitivity(0.1f) {
+	mouseSensitivity(0.1f),
+    fogMinDist(10.0f),
+    fogMaxDist(30.0f),
+    fogColor(vec3(0.5f, 0.5f, 0.5f)) {
 	ogre = ObjMesh::load("media/lizard_creature_28_retopology.obj", false, false);
 	corridor = ObjMesh::load("media/Corridor 8 straight.obj", false, false);
 	
@@ -64,13 +67,18 @@ void SceneBasic_Uniform::initScene()
     projection = mat4(1.0f);
     angle = 0.0f;
 
-    prog.setUniform("Light.L", vec3(1.0f));
-    prog.setUniform("Light.La", vec3(0.2f));
+    prog.setUniform("Light.L", vec3(0.9f));
+    prog.setUniform("Light.La", vec3(0.3f));
     
     prog.setUniform("Material.Kd", vec3(0.9f, 0.9f, 0.9f));
     prog.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
     prog.setUniform("Material.Ka", vec3(0.1f, 0.1f, 0.1f));
     prog.setUniform("Material.Shininess", 100.0f);
+    
+    // Initialize fog uniforms
+    prog.setUniform("Fog.MaxDist", fogMaxDist);
+    prog.setUniform("Fog.MinDist", fogMinDist);
+    prog.setUniform("Fog.Color", fogColor);
 }
 
 void SceneBasic_Uniform::compile()
@@ -189,8 +197,9 @@ void SceneBasic_Uniform::render()
 	prog.setUniform("Material.Shininess", 30.0f);
 	
 	model = mat4(1.0f);
-	model = glm::translate(model, vec3(0.0f, 0.0f, 0.0f));
-	model = glm::scale(model, vec3(1.0f));
+	model = glm::translate(model, vec3(3.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(-90.0f), vec3(0.0f, 1.0f, 0.0f));
+	model = glm::scale(model, vec3(1.8f));
 	setMatrices();
 	ogre->render();
 	
@@ -209,12 +218,12 @@ void SceneBasic_Uniform::render()
 	prog.setUniform("Material.Ks", vec3(0.9f, 0.9f, 0.9f));
 	prog.setUniform("Material.Shininess", 120.0f);
 	
-	int numCorridors = 5;
+	int numCorridors = 15;
 	
 	for (int i = 0; i < numCorridors; i++) {
 		model = mat4(1.0f);
 		// Position each corridor with an x-offset of 5 units
-		model = glm::translate(model, vec3(-15.0f + (i * 5.0f), 2.0f, -0.0f));
+		model = glm::translate(model, vec3(-45.0f + (i * 5.0f), 2.0f, -0.0f));
 		model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
 		model = glm::scale(model, vec3(0.5f));
 		setMatrices();
