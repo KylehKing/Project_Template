@@ -2,6 +2,7 @@
 #include "scene.h"
 #include <GLFW/glfw3.h>
 #include "glutils.h"
+#include "../scenebasic_uniform.h"
 
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
@@ -16,6 +17,9 @@ private:
     GLFWwindow * window;
     int fbw, fbh;
 	bool debug;           // Set true to enable debug messages
+    
+    // Static pointer to the current scene for callbacks
+    static Scene* currentScene;
 
 public:
     SceneRunner(const std::string & windowTitle, int width = WIN_WIDTH, int height = WIN_HEIGHT, int samples = 0) : debug(true) {
@@ -73,6 +77,18 @@ public:
         scene.setDimensions(fbw, fbh);
         scene.initScene();
         scene.resize(fbw, fbh);
+        
+        // Store the current scene for callbacks
+        currentScene = &scene;
+        
+        // Set up keyboard callback
+        glfwSetKeyCallback(window, keyCallback);
+        
+        // Set up mouse callback
+        glfwSetCursorPosCallback(window, mouseCallback);
+        
+        // Capture the mouse cursor
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // Enter the main loop
         mainLoop(window, scene);
@@ -115,6 +131,37 @@ private:
             printf("  %11s : %s\n", it.first.c_str(), it.second.c_str());
         }
     }
+    
+    // Keyboard callback function
+    static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        // Cast the scene to SceneBasic_Uniform to access processKeyInput
+        SceneBasic_Uniform* scene = dynamic_cast<SceneBasic_Uniform*>(currentScene);
+        if (scene) {
+            // Convert GLFW key to ASCII
+            unsigned char asciiKey = 0;
+            if (key >= GLFW_KEY_A && key <= GLFW_KEY_Z) {
+                asciiKey = 'A' + (key - GLFW_KEY_A);
+            } else if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9) {
+                asciiKey = '0' + (key - GLFW_KEY_0);
+            } else if (key == GLFW_KEY_SPACE) {
+                asciiKey = ' ';
+            }
+            
+            if (asciiKey != 0) {
+                bool pressed = (action == GLFW_PRESS || action == GLFW_REPEAT);
+                scene->processKeyInput(asciiKey, pressed);
+            }
+        }
+    }
+    
+    // Mouse callback function
+    static void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
+        // Cast the scene to SceneBasic_Uniform to access processMouseMovement
+        SceneBasic_Uniform* scene = dynamic_cast<SceneBasic_Uniform*>(currentScene);
+        if (scene) {
+            scene->processMouseMovement(static_cast<float>(xpos), static_cast<float>(ypos));
+        }
+    }
 
     void mainLoop(GLFWwindow * window, Scene & scene) {
         while( ! glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE) ) {
@@ -131,3 +178,6 @@ private:
         }
     }
 };
+
+// Initialize static member
+Scene* SceneRunner::currentScene = nullptr;
