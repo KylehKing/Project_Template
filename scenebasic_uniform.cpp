@@ -35,7 +35,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     fogMinDist(10.0f),
     fogMaxDist(30.0f),
     fogColor(vec3(0.5f, 0.5f, 0.5f)) {
-	ogre = ObjMesh::load("media/lizard_creature_28_retopology.obj", false, false);
+	lizard = ObjMesh::load("media/lizard_creature_28_retopology.obj", false, false);
 	corridor = ObjMesh::load("media/Corridor 8 straight.obj", false, false);
 	
 	// Initialize key states
@@ -201,7 +201,7 @@ void SceneBasic_Uniform::render()
 	model = glm::rotate(model, glm::radians(-90.0f), vec3(0.0f, 1.0f, 0.0f));
 	model = glm::scale(model, vec3(1.8f));
 	setMatrices();
-	ogre->render();
+	lizard->render();
 	
 	// Render multiple corridors
 	// Bind corridor textures

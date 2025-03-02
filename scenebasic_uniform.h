@@ -21,7 +21,7 @@ class SceneBasic_Uniform : public Scene
 private:
     //Cube cube;
     //Teapot teapot;
-    std::unique_ptr<ObjMesh> ogre;
+    std::unique_ptr<ObjMesh> lizard;
     std::unique_ptr<ObjMesh> corridor;
    
     float rotSpeed;
