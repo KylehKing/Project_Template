@@ -4,8 +4,8 @@
 #include "glutils.h"
 #include "../scenebasic_uniform.h"
 
-#define WIN_WIDTH 800
-#define WIN_HEIGHT 600
+#define WIN_WIDTH 1600
+#define WIN_HEIGHT 1200
 
 #include <map>
 #include <string>
