@@ -5,7 +5,9 @@ in vec3 Position;
 in vec3 Normal;
 in vec3 WorldPos;
 
+layout (binding = 0) uniform sampler2D RenderTex;
 layout (location = 0) out vec4 FragColor;
+const vec3 lum=vec3(0.2126, 0.7152, 0.0722);
 
 uniform struct LightInfo {
     vec4 Position;
@@ -28,6 +30,8 @@ uniform struct FogInfo {
 
 uniform sampler2D DiffTex;
 uniform sampler2D NormalTex;
+uniform float EdgeThreshold;
+uniform int Pass;
 
 // Calculate TBN matrix using derivatives
 mat3 calculateTBN(vec3 N) {
@@ -63,7 +67,11 @@ vec3 blinnPhong(vec3 position, vec3 normal) {
     return ambient + Light.L * (diffuse + spec);
 }
 
-void main() {
+float luminance(vec3 color) {
+    return dot(lum,color);
+}
+
+vec4 pass1(){
     vec3 normalMap = texture(NormalTex, TexCoord).rgb * 2.0 - 1.0;
     mat3 TBN = calculateTBN(normalize(Normal));
     
@@ -80,4 +88,32 @@ void main() {
     finalColor = mix(Fog.Color, finalColor, fogFactor);
     
     FragColor = vec4(finalColor, 1.0);
+
+    return FragColor;
+}
+
+vec4 pass2() {
+    ivec2 pix = ivec2(gl_FragCoord.xy);
+    float s00 = luminance(texelFetchOffset(RenderTex, pix, 0, ivec2(-1,1)).rgb);
+    float s10 = luminance(texelFetchOffset(RenderTex, pix, 0, ivec2(-1,0)).rgb);
+    float s20 = luminance(texelFetchOffset(RenderTex, pix, 0, ivec2(-1,-1)).rgb);
+    float s01 = luminance(texelFetchOffset(RenderTex, pix, 0, ivec2(0,1)).rgb);
+    float s21 = luminance(texelFetchOffset(RenderTex, pix, 0, ivec2(0,-1)).rgb);
+    float s02 = luminance(texelFetchOffset(RenderTex, pix, 0, ivec2(1,1)).rgb);
+    float s12 = luminance(texelFetchOffset(RenderTex, pix, 0, ivec2(1,0)).rgb);
+    float s22 = luminance(texelFetchOffset(RenderTex, pix, 0, ivec2(1,-1)).rgb);
+    
+    float sx = s00+2*s10+s20-(s02+2*s12+s22);
+    float sy = s00+2*s01+s02-(s20+2*s21+s22);
+    float g = sx*sx+sy*sy;
+    
+    if (g > EdgeThreshold)
+        return vec4(1.0);
+    else
+        return texelFetch(RenderTex, pix, 0);
+}
+
+void main() {
+    if (Pass == 1) FragColor = pass1();
+    if (Pass == 2) FragColor = pass2();
 }

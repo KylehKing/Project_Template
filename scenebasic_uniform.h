@@ -23,6 +23,7 @@ private:
     //Teapot teapot;
     std::unique_ptr<ObjMesh> lizard;
     std::unique_ptr<ObjMesh> corridor;
+    GLuint fsQuad, renderTex, fboHandle;
    
     float rotSpeed;
 	float tPrev;
@@ -52,6 +53,9 @@ private:
 
     GLSLProgram prog;
     void setMatrices();
+    void setupFBO();
+    void pass1();
+    void pass2();
 
     // Map to store texture IDs
     std::map<std::string, GLuint> textures;
